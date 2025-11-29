@@ -1,0 +1,138 @@
+﻿@model NetworkCafesControllers.Models.ViewModels.Auth.RegisterViewModel
+
+@{
+    ViewData["Title"] = "تسجيل حساب جديد";
+}
+
+
+<div class="login-page">
+    <div class="login-card">
+        <div class="login-card-inner">
+            <div class="row g-0" dir="rtl">
+
+                <!-- الجزء التعريفي (يمين في العربي – ظاهر على الشاشات الكبيرة) -->
+                <div class="col-lg-5 d-none d-lg-flex flex-column justify-content-between login-hero">
+                    <div>
+                        <div class="login-hero-badge">
+                            <span class="dot"></span>
+                            <span>إنشاء حساب جديد</span>
+                        </div>
+
+                        <h1 class="login-hero-title">
+                            انضم لشبكة الكافيهات المتصلة
+                        </h1>
+                        <p class="login-hero-sub">
+                            سجّل حسابك لتبدأ في إدارة الفروع، متابعة الجلسات، ومراقبة الأداء من لوحة تحكم واحدة.
+                        </p>
+                    </div>
+
+                    <div class="login-hero-stats">
+                        <div class="login-hero-stat">
+                            <strong>5 دقائق</strong>
+                            <span>ويكون حسابك جاهز بالكامل</span>
+                        </div>
+                        <div class="login-hero-stat">
+                            <strong>متابعة حيّة</strong>
+                            <span>لأجهزة الشبكة في الفروع</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- فورم التسجيل -->
+                <div class="col-lg-7">
+                    <div class="login-form-wrapper">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="login-logo">
+                                NETWORK CAFES
+                            </div>
+                            <span style="font-size:.75rem;color:#9ca3af;">
+                                إنشاء حساب مسؤول
+                            </span>
+                        </div>
+
+                        <h2 class="login-title text-end">
+                            تسجيل حساب جديد ✨
+                        </h2>
+                        <p class="login-subtitle text-end">
+                            أدخل بياناتك الأساسية لإنشاء حساب والتحكم في شبكة الكافيهات.
+                        </p>
+
+                        <form asp-action="Register" method="post" class="row g-3">
+                            @Html.AntiForgeryToken()
+
+                            <div asp-validation-summary="All" class="text-danger mb-1 small"></div>
+
+                            <div class="col-12">
+                                <label asp-for="UserName" class="login-label"></label>
+                                <input asp-for="UserName"
+                                       class="form-control login-input"
+                                       autocomplete="username"
+                                       placeholder="اسم المستخدم" />
+                                <span asp-validation-for="UserName"
+                                      class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="Email" class="login-label"></label>
+                                <input asp-for="Email"
+                                       class="form-control login-input"
+                                       autocomplete="email"
+                                       placeholder="example@domain.com" />
+                                <span asp-validation-for="Email"
+                                      class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="PhoneNumber" class="login-label"></label>
+                                <input asp-for="PhoneNumber"
+                                       class="form-control login-input"
+                                       autocomplete="tel"
+                                       placeholder="رقم الجوال" />
+                                <span asp-validation-for="PhoneNumber"
+                                      class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="Password" class="login-label"></label>
+                                <input asp-for="Password"
+                                       class="form-control login-input"
+                                       autocomplete="new-password"
+                                       placeholder="كلمة المرور" />
+                                <span asp-validation-for="Password"
+                                      class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="ConfirmPassword" class="login-label"></label>
+                                <input asp-for="ConfirmPassword"
+                                       class="form-control login-input"
+                                       autocomplete="new-password"
+                                       placeholder="تأكيد كلمة المرور" />
+                                <span asp-validation-for="ConfirmPassword"
+                                      class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12 mt-2">
+                                <button type="submit" class="btn btn-register-submit">
+                                    <span>إنشاء الحساب</span>
+                                    <i>✓</i>
+                                </button>
+                            </div>
+
+                            <div class="col-12 login-footer">
+                                عندك حساب بالفعل؟
+                                <a asp-action="Login">تسجيل الدخول</a>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+
+            </div> <!-- row -->
+        </div> <!-- inner -->
+    </div> <!-- card -->
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

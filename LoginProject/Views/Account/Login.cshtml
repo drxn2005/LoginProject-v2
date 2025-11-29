@@ -1,0 +1,162 @@
+﻿@model NetworkCafesControllers.Models.ViewModels.Auth.LoginViewModel
+@using Microsoft.AspNetCore.Identity
+@using NetworkCafesControllers.Models.Entities
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    var externalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+}
+
+
+<div class="login-page">
+    <div class="login-card">
+        <div class="login-card-inner">
+            <div class="row g-0" dir="rtl">
+                <!-- الجزء التعريفي (يمين في العربي – ظاهر على الشاشات الكبيرة) -->
+                <div class="col-lg-5 d-none d-lg-flex flex-column justify-content-between login-hero">
+                    <div>
+                        <div class="login-hero-badge">
+                            <span class="dot"></span>
+                            <span>لوحة تحكم الكافيهات المتصلة</span>
+                        </div>
+
+                        <h1 class="login-hero-title">
+                            أهلاً بك في شبكة الكافيهات
+                        </h1>
+                        <p class="login-hero-sub">
+                            تابع الفروع، الأجهزة، الجلسات، والتقارير اليومية من مكان واحد بسهولة وسرعة.
+                        </p>
+                    </div>
+
+                    <div class="login-hero-stats">
+                        <div class="login-hero-stat">
+                            <strong>24/7</strong>
+                            <span>مراقبة فورية للفروع</span>
+                        </div>
+                        @* <div class="login-hero-stat">
+                            <strong>+99</strong>
+                            <span>جهاز متصل حالياً</span>
+                        </div> *@
+                    </div>
+                </div>
+
+                <!-- فورم تسجيل الدخول -->
+                <div class="col-lg-7">
+                    <div class="login-form-wrapper">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="login-logo">
+                                NETWORK CAFES
+                            </div>
+                            <span style="font-size:.75rem;color:#9ca3af;">
+                                نسخة المسؤول
+                            </span>
+                        </div>
+
+                        <h2 class="login-title text-end">
+                            مرحباً بعودتك 👋
+                        </h2>
+                        <p class="login-subtitle text-end">
+                            من فضلك قم بتسجيل الدخول لمتابعة إدارة الشبكة والفروع.
+                        </p>
+
+                        <form asp-action="Login" method="post" class="row g-3">
+                            @Html.AntiForgeryToken()
+
+                            <div asp-validation-summary="All" class="text-danger mb-2"></div>
+
+                            <div class="col-12">
+                                <label asp-for="UserNameOrEmail" class="login-label"></label>
+                                <input asp-for="UserNameOrEmail"
+                                       class="form-control login-input"
+                                       placeholder="example@domain.com" />
+                                <span asp-validation-for="UserNameOrEmail" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label asp-for="Password" class="login-label mb-0"></label>
+                                    <a asp-action="ForgotPassword" class="login-link">
+                                        نسيت كلمة المرور؟
+                                    </a>
+                                </div>
+                                <input asp-for="Password"
+                                       class="form-control login-input"
+                                       placeholder="••••••••" />
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-12 d-flex justify-content-between align-items-center mt-1">
+                                <div class="form-check">
+                                    <input asp-for="RememberMe"
+                                           class="form-check-input"
+                                           style="cursor:pointer;" />
+                                    <label asp-for="RememberMe"
+                                           class="form-check-label login-remember"
+                                           style="cursor:pointer;"></label>
+                                </div>
+
+                                <a asp-action="Register" class="login-link">
+                                    إنشاء حساب جديد
+                                </a>
+                            </div>
+
+                            <div class="col-12 mt-2">
+                                <button type="submit" class="btn btn-login-submit">
+                                    <span>تسجيل الدخول</span>
+                                    <i>➜</i>
+                                </button>
+                            </div>
+                        </form>
+
+                        @* تسجيل الدخول الخارجي *@
+                        @if (externalLogins.Any())
+                        {
+                            <div class="login-divider">
+                                <span class="line"></span>
+                                <span>أو سجّل الدخول باستخدام</span>
+                                <span class="line"></span>
+                            </div>
+
+                            <form asp-action="ExternalLogin"
+                                  asp-controller="Account"
+                                  method="post" class="row g-2 mt-1">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="returnUrl"
+                                       value="@(ViewData["ReturnUrl"] ?? Url.Content("~/"))" />
+
+                                @foreach (var provider in externalLogins)
+                                {
+                                    var btnExtraClass = "";
+                                    if (provider.Name == "Google") btnExtraClass = "social-btn-google";
+                                    else if (provider.Name == "Facebook") btnExtraClass = "social-btn-facebook";
+                                    else if (provider.Name == "Twitter") btnExtraClass = "social-btn-twitter";
+                                    else if (provider.Name == "Microsoft") btnExtraClass = "social-btn-microsoft";
+
+                                    <div class="col-12">
+                                        <button type="submit"
+                                                class="social-btn @btnExtraClass"
+                                                name="provider"
+                                                value="@provider.Name">
+                                            <span class="provider">@provider.DisplayName</span>
+                                            <span class="name">تسجيل سريع</span>
+                                        </button>
+                                    </div>
+                                }
+                            </form>
+                        }
+
+                        <div class="login-footer">
+                            لا تملك حساباً بعد؟
+                            <a asp-action="Register">قم بإنشاء حسابك الآن</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div> <!-- row -->
+        </div> <!-- inner -->
+    </div> <!-- card -->
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
