@@ -1,50 +1,310 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@{
+    var themeCookie = Context.Request.Cookies["theme"] ?? "system";
+
+    if (themeCookie != "light" && themeCookie != "dark" && themeCookie != "system")
+    {
+        themeCookie = "system";
+    }
+
+    var themeIconClass = themeCookie switch
+    {
+        "light" => "bi-brightness-high-fill",
+        "dark" => "bi-moon-stars-fill",
+        _ => "bi-circle-half"
+    };
+}
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-bs-theme="light">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - LoginProject</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <title>@ViewData["Title"] - Network Cafes System</title>
+
+    <!-- Bootstrap 5.3 (يدعم data-bs-theme) -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+
+    <!-- Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <!-- Toastr -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+
+    <!-- Site CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/LoginProject.styles.css" asp-append-version="true" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">LoginProject</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+<body class="d-flex flex-column min-vh-100 bg-body">
+
+    <div class="app-shell">
+        <!-- Header / Navbar -->
+        <header>
+            <nav class="navbar navbar-expand-lg app-navbar bg-body-tertiary border-bottom shadow-sm">
+                <div class="container-xxl">
+
+                    <!-- Brand -->
+                    <a class="navbar-brand d-flex align-items-center gap-2"
+                       asp-area=""
+                       asp-controller="Cafes"
+                       asp-action="Index">
+                        <div class="brand-badge d-flex align-items-center justify-content-center">
+                            <i class="bi bi-grid-1x2"></i>
+                        </div>
+                        <div class="d-flex flex-column">
+                            <span class="fw-semibold">Network Cafes</span>
+                            <small class="text-body-secondary">لوحة إدارة النظام</small>
+                        </div>
+                    </a>
+
+                    <!-- Toggler -->
+                    <button class="navbar-toggler border-0"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#appNavbar"
+                            aria-controls="appNavbar"
+                            aria-expanded="false"
+                            aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <!-- Navbar Content -->
+                    <div class="collapse navbar-collapse" id="appNavbar">
+
+                        <!-- Left Nav (links) -->
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-pill @(ViewContext.RouteData.Values["controller"]?.ToString() == "Cafes" ? "active" : "")"
+                                   asp-area=""
+                                   asp-controller="Cafes"
+                                   asp-action="Index">
+                                    <i class="bi bi-shop me-1"></i>
+                                    العملاء
+                                </a>
+                            </li>
+
+                            @* مثال لصفحات أخرى:
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-pill"
+                                   asp-controller="Reports"
+                                   asp-action="Index">
+                                    <i class="bi bi-bar-chart me-1"></i>
+                                    التقارير
+                                </a>
+                            </li>
+                            *@
+                        </ul>
+
+                        <!-- Right side (theme + user) -->
+                        <div class="d-flex align-items-center gap-3 mb-2 mb-lg-0">
+
+                            <!-- Theme Switcher (شمس / قمر / System) -->
+                            <div class="dropdown">
+                                <button class="btn btn-outline-secondary btn-sm rounded-pill d-flex align-items-center gap-2"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false">
+                                    <i id="themeIcon" class="bi @themeIconClass"></i>
+                                    <span class="d-none d-sm-inline">المظهر</span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <form asp-controller="Theme" asp-action="SetTheme" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="theme" value="light" />
+                                            <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="bi bi-brightness-high me-2 text-warning"></i>
+                                                وضع فاتح
+                                            </button>
+                                        </form>
+                                    </li>
+                                    <li>
+                                        <form asp-controller="Theme" asp-action="SetTheme" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="theme" value="dark" />
+                                            <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="bi bi-moon-stars me-2 text-primary"></i>
+                                                وضع داكن
+                                            </button>
+                                        </form>
+                                    </li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li>
+                                        <form asp-controller="Theme" asp-action="SetTheme" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="theme" value="system" />
+                                            <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="bi bi-circle-half me-2"></i>
+                                                حسب إعداد النظام
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- User section -->
+                            <ul class="navbar-nav flex-row align-items-center gap-2">
+                                @if (User.Identity?.IsAuthenticated ?? false)
+                                {
+                                    <li class="nav-item d-none d-md-block">
+                                        <span class="nav-link px-2">
+                                            <i class="bi bi-person-circle me-1"></i>
+                                            مرحباً، @User.Identity.Name
+                                        </span>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link px-2"
+                                           asp-controller="Account"
+                                           asp-action="ChangePassword">
+                                            <i class="bi bi-key me-1"></i>
+                                            كلمة المرور
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <form asp-controller="Account"
+                                              asp-action="Logout"
+                                              method="post"
+                                              class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit"
+                                                    class="nav-link btn btn-link p-0 border-0">
+                                                <i class="bi bi-box-arrow-right me-1"></i>
+                                                خروج
+                                            </button>
+                                        </form>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="nav-item">
+                                        <a class="btn btn-sm btn-outline-primary rounded-pill"
+                                           asp-controller="Account"
+                                           asp-action="Login">
+                                            <i class="bi bi-box-arrow-in-right me-1"></i>
+                                            دخول
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+
+                        </div> <!-- end right side -->
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Main -->
+        <main class="app-main py-3">
+            <div class="container-xxl app-main-container">
+                <div class="app-surface p-3 p-md-4 rounded-3 border bg-body shadow-sm">
+
+                    <!-- Page header (اختياري) -->
+                    <div class="app-surface-header d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                        <div>
+                            <h5 class="mb-0">@ViewData["Title"]</h5>
+                        </div>
+                        @* ممكن تحط Actions للصفحة هنا لو حابب *@
+                    </div>
+
+                    @RenderBody()
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
         </main>
+
+        <!-- Footer -->
+        <footer class="app-footer py-3 mt-3 bg-body-tertiary border-top">
+            <div class="container-xxl d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <span class="text-body-secondary">
+                    &copy; @DateTime.Now.Year - سيستم إدارة أنظمة أورانج - Network Cafes
+                </span>
+                <span class="small">
+                    <a href="https://www.facebook.com/tato210"
+                       class="link-body-emphasis link-underline-opacity-0 link-underline-opacity-100-hover mx-1">
+                        سياسة الخصوصية
+                    </a>
+                    |
+                    <a href="https://www.facebook.com/tato210"
+                       class="link-body-emphasis link-underline-opacity-0 link-underline-opacity-100-hover mx-1">
+                        تواصل معنا
+                    </a>
+                </span>
+            </div>
+        </footer>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - LoginProject - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <script>
+        // Theme handling (light / dark / system) + icon تبديل
+        (function () {
+            const savedTheme = '@themeCookie';
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+            const themeIcon = document.getElementById('themeIcon');
+
+            const getTheme = () => {
+                if (savedTheme === 'light' || savedTheme === 'dark') {
+                    return savedTheme;
+                }
+                return prefersDark.matches ? 'dark' : 'light';
+            };
+
+            const applyTheme = () => {
+                const theme = getTheme();
+                document.documentElement.setAttribute('data-bs-theme', theme);
+
+                if (!themeIcon) return;
+
+                themeIcon.classList.remove(
+                    'bi-brightness-high-fill',
+                    'bi-moon-stars-fill',
+                    'bi-circle-half'
+                );
+
+                if (savedTheme === 'system') {
+                    // System: أظهر نص دايرة + الشمس/القمر حسب النظام
+                    themeIcon.classList.add('bi-circle-half');
+                }
+
+                if (theme === 'dark') {
+                    themeIcon.classList.add('bi-moon-stars-fill');
+                } else {
+                    themeIcon.classList.add('bi-brightness-high-fill');
+                }
+            };
+
+            applyTheme();
+            prefersDark.addEventListener('change', applyTheme);
+        })();
+
+        // Toastr notifications من TempData
+        @if (TempData["Success"] != null)
+        {
+                <text>
+                    toastr.success('@TempData["Success"]');
+                </text>
+        }
+        @if (TempData["Error"] != null)
+        {
+                <text>
+                    toastr.error('@TempData["Error"]');
+                </text>
+        }
+    </script>
+
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

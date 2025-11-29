@@ -1,4 +1,4 @@
-html {
+﻿html {
   font-size: 14px;
 }
 
@@ -357,5 +357,130 @@ body {
 
     .login-title {
         font-size: 1.25rem;
+    }
+}
+
+body {
+    min-height: 100vh;
+    background: radial-gradient(circle at top right, #1d4ed8 0, transparent 55%), radial-gradient(circle at bottom left, #0f766e 0, #020617 60%);
+    color: #e5e7eb;
+}
+
+.app-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Navbar مودرن */
+.app-navbar {
+    background: rgba(15, 23, 42, 0.92);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.75), 0 0 0 1px rgba(15, 23, 42, 0.6);
+}
+
+    .app-navbar .navbar-brand {
+        color: #e5e7eb;
+    }
+
+        .app-navbar .navbar-brand:hover {
+            color: #f9fafb;
+        }
+
+.brand-badge {
+    width: 38px;
+    height: 38px;
+    border-radius: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at top left, #38bdf8, #6366f1);
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.65);
+    color: #f9fafb;
+    font-size: 1.1rem;
+}
+
+.nav-link {
+    color: #cbd5f5 !important;
+    font-size: 0.9rem;
+}
+
+    .nav-link.active,
+    .nav-link:hover {
+        color: #f9fafb !important;
+    }
+
+.nav-link-pill {
+    border-radius: 999px;
+    padding-inline: 0.85rem;
+    padding-block: 0.35rem;
+}
+
+    .nav-link-pill.active,
+    .nav-link-pill:hover {
+        background: rgba(99, 102, 241, 0.26);
+    }
+
+.nav-cta {
+    border-radius: 999px;
+    font-size: 0.85rem;
+    border: 1px solid rgba(148, 163, 184, 0.5);
+    color: #e5e7eb;
+    background: rgba(15, 23, 42, 0.8);
+}
+
+    .nav-cta:hover {
+        border-color: #38bdf8;
+        background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+        color: #f9fafb;
+    }
+
+/* المنطقة الرئيسية */
+.app-main {
+    flex: 1;
+}
+
+.app-main-container {
+    padding-top: 1.75rem;
+    padding-bottom: 1.75rem;
+}
+
+.app-surface {
+    background: rgba(15, 23, 42, 0.96);
+    border-radius: 1.25rem;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 22px 45px rgba(15, 23, 42, 0.9), 0 0 0 1px rgba(148, 163, 184, 0.4);
+    border: 1px solid rgba(30, 64, 175, 0.55);
+}
+
+.app-surface-header {
+    border-bottom: 1px solid rgba(31, 41, 55, 0.85);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+/* Footer */
+.app-footer {
+    border-top: 1px solid rgba(30, 64, 175, 0.7);
+    background: rgba(15, 23, 42, 0.97);
+    color: #9ca3af;
+    font-size: 0.8rem;
+}
+
+    .app-footer a {
+        color: #c4b5fd;
+        text-decoration: none;
+    }
+
+        .app-footer a:hover {
+            color: #e5e7eb;
+        }
+
+@media (max-width: 576px) {
+    .app-surface {
+        border-radius: 1rem;
+        padding-inline: 1.1rem;
+        padding-block: 1rem;
     }
 }
