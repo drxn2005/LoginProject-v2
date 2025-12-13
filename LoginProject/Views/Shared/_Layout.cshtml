@@ -41,6 +41,29 @@
 </head>
 <body class="d-flex flex-column min-vh-100 bg-body">
 
+    <!-- في قسم navbar-left -->
+    <li class="nav-item">
+        <a class="nav-link nav-link-pill @(ViewContext.RouteData.Values["controller"]?.ToString() == "Brands" ? "active" : "")"
+           asp-area=""
+           asp-controller="Brands"
+           asp-action="Index">
+            <i class="bi bi-tags me-1"></i>
+            العلامات التجارية
+        </a>
+    </li>
+
+    @if (User.IsInRole("Admin"))
+    {
+        <li class="nav-item">
+            <a class="nav-link nav-link-pill @(ViewContext.RouteData.Values["area"]?.ToString() == "Admin" ? "active" : "")"
+               asp-area="Admin"
+               asp-controller="Users"
+               asp-action="Index">
+                <i class="bi bi-people me-1"></i>
+                المستخدمين
+            </a>
+        </li>
+    }
     <div class="app-shell">
         <!-- Header / Navbar -->
         <header>

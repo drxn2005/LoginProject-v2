@@ -1,0 +1,59 @@
+﻿@using NetworkCafesControllers.Models.ViewModels.Admin
+@model UserViewModel
+@{
+    ViewData["Title"] = "حذف مستخدم";
+}
+
+<div class="app-surface-header mb-4">
+    <h5 class="mb-0">@ViewData["Title"]</h5>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <div class="mb-4">
+                    <i class="bi bi-exclamation-triangle text-warning" style="font-size: 4rem;"></i>
+                </div>
+
+                <h4 class="mb-3">تأكيد الحذف</h4>
+
+                <p class="text-muted mb-4">
+                    هل أنت متأكد من حذف المستخدم
+                    <strong class="text-danger">@Model.UserName</strong>؟
+                    <br>
+                    هذا الإجراء لا يمكن التراجع عنه.
+                </p>
+
+                <div class="card mb-4">
+                    <div class="card-body text-start">
+                        <p><strong>اسم المستخدم:</strong> @Model.UserName</p>
+                        <p><strong>البريد الإلكتروني:</strong> @Model.Email</p>
+                        <p>
+                            <strong>الأدوار:</strong>
+                            @foreach (var role in Model.Roles)
+                            {
+                                <span class="badge bg-secondary me-1">@role</span>
+                            }
+                        </p>
+                        <p><strong>تاريخ التسجيل:</strong> @Model.RegistrationDate.ToString("yyyy-MM-dd")</p>
+                    </div>
+                </div>
+
+                <form asp-action="Delete" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.Id" />
+
+                    <div class="d-flex justify-content-center gap-3">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-right me-1"></i> إلغاء
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash me-1"></i> نعم، احذف
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,207 @@
+﻿@using NetworkCafesControllers.Models.ViewModels
+@model List<BrandViewModel>
+@{
+    ViewData["Title"] = "العلامات التجارية";
+}
+
+<div class="app-surface-header d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div>
+        <h5 class="mb-0">@ViewData["Title"]</h5>
+    </div>
+    <div>
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i>
+                علامة تجارية جديدة
+            </a>
+        }
+    </div>
+</div>
+
+<!-- Search and Filter -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-8">
+                <input type="text" name="search" value="@ViewBag.Search"
+                       class="form-control" placeholder="بحث عن علامة تجارية..." />
+            </div>
+            <div class="col-md-2">
+                <select name="pageSize" class="form-select" onchange="this.form.submit()">
+                    <option value="12" selected="@(ViewBag.PageSize == 12)">12</option>
+                    <option value="24" selected="@(ViewBag.PageSize == 24)">24</option>
+                    <option value="36" selected="@(ViewBag.PageSize == 36)">36</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-outline-primary w-100">
+                    <i class="bi bi-search me-1"></i> بحث
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Brands Grid -->
+@if (Model.Any())
+{
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        @foreach (var brand in Model)
+        {
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body d-flex flex-column">
+                        <!-- Brand Logo/Header -->
+                        <div class="text-center mb-3">
+                            @if (!string.IsNullOrEmpty(brand.LogoUrl))
+                            {
+                                <img src="@brand.LogoUrl" alt="@brand.Name"
+                                     class="img-fluid rounded" style="max-height: 100px;" />
+                            }
+                            else
+                            {
+                                <div class="bg-light rounded p-4">
+                                    <i class="bi bi-shop" style="font-size: 3rem; color: #6c757d;"></i>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Brand Info -->
+                        <div class="flex-grow-1">
+                            <h6 class="card-title mb-1">@brand.Name</h6>
+                            @if (!string.IsNullOrEmpty(brand.Description))
+                            {
+                                <p class="card-text text-muted small mb-2">
+                                    @(brand.Description.Length > 80 ? brand.Description.Substring(0, 80) + "..." : brand.Description)
+                                </p>
+                            }
+
+                            <div class="d-flex justify-content-between align-items-center small">
+                                <span>
+                                    @if (brand.IsActive)
+                                    {
+                                        <span class="badge bg-success">نشط</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">غير نشط</span>
+                                    }
+                                </span>
+                                <span class="text-muted">
+                                    @brand.CreatedAt.ToString("yyyy-MM-dd")
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex gap-2 mt-3 pt-3 border-top">
+                            <a asp-action="Details" asp-route-id="@brand.Id"
+                               class="btn btn-outline-info btn-sm flex-fill">
+                                <i class="bi bi-eye"></i>
+                            </a>
+
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a asp-action="Edit" asp-route-id="@brand.Id"
+                                   class="btn btn-outline-primary btn-sm flex-fill">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+
+                                <button type="button" class="btn btn-outline-danger btn-sm flex-fill"
+                                        data-bs-toggle="modal" data-bs-target="#deleteModal@(brand.Id)">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete Modal -->
+            <div class="modal fade" id="deleteModal@(brand.Id)" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">تأكيد الحذف</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            هل أنت متأكد من حذف العلامة التجارية <strong>@brand.Name</strong>؟
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                            <form asp-action="Delete" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@brand.Id" />
+                                <button type="submit" class="btn btn-danger">حذف</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Pagination -->
+    @if (ViewBag.TotalPages > 1)
+    {
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                @if (ViewBag.CurrentPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@(ViewBag.CurrentPage - 1)"
+                           asp-route-pageSize="@ViewBag.PageSize"
+                           asp-route-search="@ViewBag.Search">
+                            السابق
+                        </a>
+                    </li>
+                }
+
+                @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+                {
+                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@i"
+                           asp-route-pageSize="@ViewBag.PageSize"
+                           asp-route-search="@ViewBag.Search">
+                            @i
+                        </a>
+                    </li>
+                }
+
+                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@(ViewBag.CurrentPage + 1)"
+                           asp-route-pageSize="@ViewBag.PageSize"
+                           asp-route-search="@ViewBag.Search">
+                            التالي
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+}
+else
+{
+    <div class="text-center py-5">
+        <i class="bi bi-shop" style="font-size: 4rem; color: #6c757d;"></i>
+        <h4 class="mt-3">لا توجد علامات تجارية</h4>
+        <p class="text-muted mb-4">لم يتم إضافة أي علامات تجارية بعد.</p>
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i>
+                أضف أول علامة تجارية
+            </a>
+        }
+    </div>
+}

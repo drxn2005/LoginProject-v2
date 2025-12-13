@@ -1,0 +1,255 @@
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using NetworkCafesControllers.Data;
+using NetworkCafesControllers.Models.Entities;
+using NetworkCafesControllers.Models.ViewModels;
+using System.Security.Claims;
+
+namespace NetworkCafesControllers.Controllers
+{
+    [Authorize]
+    public class BrandsController : Controller
+    {
+        private readonly AppDbContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public BrandsController(AppDbContext context, IHttpContextAccessor httpContextAccessor)
+        {
+            _context = context;
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        private string GetCurrentUserId()
+        {
+            return _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+        }
+
+        // GET: Brands
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 12, string search = "")
+        {
+            var query = _context.Brands.Where(b => !b.IsDeleted);
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.Trim();
+                query = query.Where(b =>
+                    b.Name.Contains(search) ||
+                    b.Description.Contains(search));
+            }
+
+            var totalCount = await query.CountAsync();
+            var brands = await query
+                .OrderByDescending(b => b.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(b => new BrandViewModel
+                {
+                    Id = b.Id,
+                    Name = b.Name,
+                    Description = b.Description,
+                    LogoUrl = b.LogoUrl,
+                    Website = b.Website,
+                    IsActive = b.IsActive,
+                    CreatedAt = b.CreatedAt,
+                    UpdatedAt = b.UpdatedAt
+                })
+                .ToListAsync();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalCount = totalCount;
+            ViewBag.Search = search;
+            ViewBag.TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            return View(brands);
+        }
+
+        // GET: Brands/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+                return NotFound();
+
+            var brand = await _context.Brands
+                .FirstOrDefaultAsync(m => m.Id == id && !m.IsDeleted);
+
+            if (brand == null)
+                return NotFound();
+
+            var model = new BrandViewModel
+            {
+                Id = brand.Id,
+                Name = brand.Name,
+                Description = brand.Description,
+                LogoUrl = brand.LogoUrl,
+                Website = brand.Website,
+                IsActive = brand.IsActive,
+                CreatedAt = brand.CreatedAt,
+                UpdatedAt = brand.UpdatedAt
+            };
+
+            return View(model);
+        }
+
+        // GET: Brands/Create
+        [Authorize(Roles = "Admin")]
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: Brands/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Create(BrandViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var brand = new Brand
+                {
+                    Name = model.Name,
+                    Description = model.Description,
+                    LogoUrl = model.LogoUrl,
+                    Website = model.Website,
+                    IsActive = model.IsActive,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    CreatedByUserId = GetCurrentUserId()
+                };
+
+                _context.Add(brand);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "تم إنشاء العلامة التجارية بنجاح.";
+                return RedirectToAction(nameof(Index));
+            }
+            return View(model);
+        }
+
+        // GET: Brands/Edit/5
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+                return NotFound();
+
+            var brand = await _context.Brands.FindAsync(id);
+            if (brand == null || brand.IsDeleted)
+                return NotFound();
+
+            var model = new BrandViewModel
+            {
+                Id = brand.Id,
+                Name = brand.Name,
+                Description = brand.Description,
+                LogoUrl = brand.LogoUrl,
+                Website = brand.Website,
+                IsActive = brand.IsActive
+            };
+
+            return View(model);
+        }
+
+        // POST: Brands/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Edit(int id, BrandViewModel model)
+        {
+            if (id != model.Id)
+                return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var brand = await _context.Brands.FindAsync(id);
+                    if (brand == null || brand.IsDeleted)
+                        return NotFound();
+
+                    brand.Name = model.Name;
+                    brand.Description = model.Description;
+                    brand.LogoUrl = model.LogoUrl;
+                    brand.Website = model.Website;
+                    brand.IsActive = model.IsActive;
+                    brand.UpdatedAt = DateTime.UtcNow;
+                    brand.UpdatedByUserId = GetCurrentUserId();
+
+                    _context.Update(brand);
+                    await _context.SaveChangesAsync();
+
+                    TempData["Success"] = "تم تحديث العلامة التجارية بنجاح.";
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!BrandExists(id))
+                        return NotFound();
+                    throw;
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(model);
+        }
+
+        // GET: Brands/Delete/5
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+                return NotFound();
+
+            var brand = await _context.Brands
+                .FirstOrDefaultAsync(m => m.Id == id && !m.IsDeleted);
+
+            if (brand == null)
+                return NotFound();
+
+            var model = new BrandViewModel
+            {
+                Id = brand.Id,
+                Name = brand.Name,
+                Description = brand.Description,
+                LogoUrl = brand.LogoUrl,
+                Website = brand.Website,
+                IsActive = brand.IsActive,
+                CreatedAt = brand.CreatedAt
+            };
+
+            return View(model);
+        }
+
+        // POST: Brands/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var brand = await _context.Brands.FindAsync(id);
+            if (brand != null && !brand.IsDeleted)
+            {
+                brand.IsDeleted = true;
+                brand.DeletedAt = DateTime.UtcNow;
+                brand.UpdatedAt = DateTime.UtcNow;
+                brand.UpdatedByUserId = GetCurrentUserId();
+
+                _context.Update(brand);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "تم حذف العلامة التجارية بنجاح.";
+            }
+            else
+            {
+                TempData["Error"] = "العلامة التجارية غير موجودة أو محذوفة بالفعل.";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        private bool BrandExists(int id)
+        {
+            return _context.Brands.Any(e => e.Id == id && !e.IsDeleted);
+        }
+    }
+}
