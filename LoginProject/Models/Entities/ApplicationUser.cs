@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 
-namespace NetworkCafesControllers.Models.Entities
+namespace LoginProject.Models.Entities
 {
     public class ApplicationUser : IdentityUser
     {

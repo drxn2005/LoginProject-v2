@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NetworkCafesControllers.Models.ViewModels
+namespace LoginProject.Models.ViewModels
 {
     public class BrandViewModel
     {

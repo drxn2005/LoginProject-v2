@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LoginProject.Migrations
 {
     /// <inheritdoc />
-    public partial class intial : Migration
+    public partial class updatecrud : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,8 +30,14 @@ namespace LoginProject.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ThemePreference = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true, defaultValue: "system"),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false, defaultValueSql: "GETUTCDATE()"),
+                    LastLoginDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    FullName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    ProfileImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     userid = table.Column<int>(type: "int", nullable: true),
-                    ThemePreference = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -50,6 +56,29 @@ namespace LoginProject.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Brands",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    LogoUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Website = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedByUserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedByUserId = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Brands", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -196,6 +225,21 @@ namespace LoginProject.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Brands_IsActive",
+                table: "Brands",
+                column: "IsActive");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Brands_IsDeleted",
+                table: "Brands",
+                column: "IsDeleted");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Brands_Name",
+                table: "Brands",
+                column: "Name");
         }
 
         /// <inheritdoc />
@@ -215,6 +259,9 @@ namespace LoginProject.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Brands");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

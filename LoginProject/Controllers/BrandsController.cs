@@ -1,12 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using LoginProject.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NetworkCafesControllers.Data;
-using NetworkCafesControllers.Models.Entities;
-using NetworkCafesControllers.Models.ViewModels;
+using LoginProject.Data;
 using System.Security.Claims;
 
-namespace NetworkCafesControllers.Controllers
+namespace LoginProject.Controllers
 {
     [Authorize]
     public class BrandsController : Controller
@@ -43,18 +42,7 @@ namespace NetworkCafesControllers.Controllers
                 .OrderByDescending(b => b.CreatedAt)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Select(b => new BrandViewModel
-                {
-                    Id = b.Id,
-                    Name = b.Name,
-                    Description = b.Description,
-                    LogoUrl = b.LogoUrl,
-                    Website = b.Website,
-                    IsActive = b.IsActive,
-                    CreatedAt = b.CreatedAt,
-                    UpdatedAt = b.UpdatedAt
-                })
-                .ToListAsync();
+                .ToListAsync(); // هنا التغيير
 
             ViewBag.CurrentPage = page;
             ViewBag.PageSize = pageSize;
@@ -77,19 +65,7 @@ namespace NetworkCafesControllers.Controllers
             if (brand == null)
                 return NotFound();
 
-            var model = new BrandViewModel
-            {
-                Id = brand.Id,
-                Name = brand.Name,
-                Description = brand.Description,
-                LogoUrl = brand.LogoUrl,
-                Website = brand.Website,
-                IsActive = brand.IsActive,
-                CreatedAt = brand.CreatedAt,
-                UpdatedAt = brand.UpdatedAt
-            };
-
-            return View(model);
+            return View(brand);
         }
 
         // GET: Brands/Create
@@ -103,21 +79,13 @@ namespace NetworkCafesControllers.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create(BrandViewModel model)
+        public async Task<IActionResult> Create(Brand brand)
         {
             if (ModelState.IsValid)
             {
-                var brand = new Brand
-                {
-                    Name = model.Name,
-                    Description = model.Description,
-                    LogoUrl = model.LogoUrl,
-                    Website = model.Website,
-                    IsActive = model.IsActive,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
-                    CreatedByUserId = GetCurrentUserId()
-                };
+                brand.CreatedAt = DateTime.UtcNow;
+                brand.UpdatedAt = DateTime.UtcNow;
+                brand.CreatedByUserId = GetCurrentUserId();
 
                 _context.Add(brand);
                 await _context.SaveChangesAsync();
@@ -125,7 +93,7 @@ namespace NetworkCafesControllers.Controllers
                 TempData["Success"] = "تم إنشاء العلامة التجارية بنجاح.";
                 return RedirectToAction(nameof(Index));
             }
-            return View(model);
+            return View(brand);
         }
 
         // GET: Brands/Edit/5
@@ -139,45 +107,35 @@ namespace NetworkCafesControllers.Controllers
             if (brand == null || brand.IsDeleted)
                 return NotFound();
 
-            var model = new BrandViewModel
-            {
-                Id = brand.Id,
-                Name = brand.Name,
-                Description = brand.Description,
-                LogoUrl = brand.LogoUrl,
-                Website = brand.Website,
-                IsActive = brand.IsActive
-            };
-
-            return View(model);
+            return View(brand);
         }
 
         // POST: Brands/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, BrandViewModel model)
+        public async Task<IActionResult> Edit(int id, Brand brand)
         {
-            if (id != model.Id)
+            if (id != brand.Id)
                 return NotFound();
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var brand = await _context.Brands.FindAsync(id);
-                    if (brand == null || brand.IsDeleted)
+                    var existingBrand = await _context.Brands.FindAsync(id);
+                    if (existingBrand == null || existingBrand.IsDeleted)
                         return NotFound();
 
-                    brand.Name = model.Name;
-                    brand.Description = model.Description;
-                    brand.LogoUrl = model.LogoUrl;
-                    brand.Website = model.Website;
-                    brand.IsActive = model.IsActive;
-                    brand.UpdatedAt = DateTime.UtcNow;
-                    brand.UpdatedByUserId = GetCurrentUserId();
+                    existingBrand.Name = brand.Name;
+                    existingBrand.Description = brand.Description;
+                    existingBrand.LogoUrl = brand.LogoUrl;
+                    existingBrand.Website = brand.Website;
+                    existingBrand.IsActive = brand.IsActive;
+                    existingBrand.UpdatedAt = DateTime.UtcNow;
+                    existingBrand.UpdatedByUserId = GetCurrentUserId();
 
-                    _context.Update(brand);
+                    _context.Update(existingBrand);
                     await _context.SaveChangesAsync();
 
                     TempData["Success"] = "تم تحديث العلامة التجارية بنجاح.";
@@ -190,7 +148,7 @@ namespace NetworkCafesControllers.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(model);
+            return View(brand);
         }
 
         // GET: Brands/Delete/5
@@ -206,18 +164,7 @@ namespace NetworkCafesControllers.Controllers
             if (brand == null)
                 return NotFound();
 
-            var model = new BrandViewModel
-            {
-                Id = brand.Id,
-                Name = brand.Name,
-                Description = brand.Description,
-                LogoUrl = brand.LogoUrl,
-                Website = brand.Website,
-                IsActive = brand.IsActive,
-                CreatedAt = brand.CreatedAt
-            };
-
-            return View(model);
+            return View(brand);
         }
 
         // POST: Brands/Delete/5
@@ -244,6 +191,53 @@ namespace NetworkCafesControllers.Controllers
                 TempData["Error"] = "العلامة التجارية غير موجودة أو محذوفة بالفعل.";
             }
 
+            return RedirectToAction(nameof(Index));
+        }
+
+        // POST: Add Sample Brands
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddSampleBrands()
+        {
+            var sampleBrands = new List<Brand>
+            {
+                new Brand
+                {
+                    Name = "ستاربكس",
+                    Description = "مقهى عالمي مشهور بالقهوة المميزة",
+                    LogoUrl = "https://logo.clearbit.com/starbucks.com",
+                    Website = "https://www.starbucks.com",
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow.AddDays(-30),
+                    CreatedByUserId = GetCurrentUserId()
+                },
+                new Brand
+                {
+                    Name = "كافيه كوستا",
+                    Description = "سلسلة مقاهي بريطانية الأصل",
+                    LogoUrl = "https://logo.clearbit.com/costa.co.uk",
+                    Website = "https://www.costa.co.uk",
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow.AddDays(-25),
+                    CreatedByUserId = GetCurrentUserId()
+                },
+                new Brand
+                {
+                    Name = "دونكين",
+                    Description = "سلسلة مقاهي أمريكية متخصصة في القهوة والكعك",
+                    LogoUrl = "https://logo.clearbit.com/dunkindonuts.com",
+                    Website = "https://www.dunkindonuts.com",
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow.AddDays(-20),
+                    CreatedByUserId = GetCurrentUserId()
+                }
+            };
+
+            _context.Brands.AddRange(sampleBrands);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "تم إضافة 3 علامات تجارية تجريبية بنجاح!";
             return RedirectToAction(nameof(Index));
         }
 

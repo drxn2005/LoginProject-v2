@@ -1,0 +1,70 @@
+﻿@model LoginProject.Models.Brand
+
+@{
+    ViewData["Title"] = "تعديل العلامة التجارية";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-warning text-dark">
+        <h5 class="mb-0">
+            <i class="bi bi-pencil me-2"></i>
+            تعديل العلامة التجارية
+        </h5>
+    </div>
+    <div class="card-body">
+        <form asp-action="Edit" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label"></label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="LogoFile" class="form-label">تغيير الشعار</label>
+                        <input type="file" asp-for="LogoFile" class="form-control" accept="image/*" />
+                        @if (!string.IsNullOrEmpty(Model.LogoUrl))
+                        {
+                            <div class="mt-2">
+                                <img src="@Model.LogoUrl" alt="@Model.Name" class="img-thumbnail" style="max-width: 100px;" />
+                                <small class="text-muted ms-2">الشعار الحالي</small>
+                            </div>
+                        }
+                        <span asp-validation-for="LogoFile" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label"></label>
+                <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-warning">
+                    <i class="bi bi-check-circle me-1"></i>
+                    حفظ التعديلات
+                </button>
+                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-info">
+                    <i class="bi bi-eye me-1"></i>
+                    عرض التفاصيل
+                </a>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-right me-1"></i>
+                    العودة للقائمة
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

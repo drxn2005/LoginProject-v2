@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using NetworkCafesControllers.Models.Entities;
-using NetworkCafesControllers.Models.ViewModels.Admin;
+using LoginProject.Models;
+using LoginProject.Models.ViewModels.Admin;
 
-namespace NetworkCafesControllers.Services.Interfaces
+namespace LoginProject.Services.Interfaces
 {
     public interface IUserService
     {

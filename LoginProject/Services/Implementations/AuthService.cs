@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using NetworkCafesControllers.Models.Entities;
-using NetworkCafesControllers.Models.Identity;
-using NetworkCafesControllers.Models.ViewModels.Auth;
-using NetworkCafesControllers.Services.Interfaces;
+using LoginProject.Models;
+using LoginProject.Models.Identity;
+using LoginProject.Models.ViewModels.Auth;
+using LoginProject.Services.Interfaces;
+using LoginProject.Models.Entities;
 
-namespace NetworkCafesControllers.Services.Implementations
+namespace LoginProject.Services.Implementations
 {
     public class AuthService : IAuthService
     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using NetworkCafesControllers.Models.ViewModels.Auth;
+using LoginProject.Models.ViewModels.Auth;
 
-namespace NetworkCafesControllers.Services.Interfaces
+namespace LoginProject.Services.Interfaces
 {
     public interface IAuthService
     {

@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using LoginProject.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using NetworkCafesControllers.Models.Entities;
+using LoginProject.Models;
+using LoginProject.Models.Entities;
 
-namespace NetworkCafesControllers.Data
+namespace LoginProject.Data
 {
     public class AppDbContext : IdentityDbContext<ApplicationUser>
     {

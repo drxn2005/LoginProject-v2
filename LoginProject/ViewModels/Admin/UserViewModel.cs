@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NetworkCafesControllers.Models.ViewModels.Admin
+namespace LoginProject.Models.ViewModels.Admin
 {
     public class UserViewModel
     {

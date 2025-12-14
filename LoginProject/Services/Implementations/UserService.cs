@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using NetworkCafesControllers.Models.Entities;
-using NetworkCafesControllers.Models.ViewModels.Admin;
-using NetworkCafesControllers.Services.Interfaces;
+using LoginProject.Models;
+using LoginProject.Models.ViewModels.Admin;
+using LoginProject.Services.Interfaces;
+using LoginProject.Models.Entities;
+using LoginProject.Models.Entities;
 
-namespace NetworkCafesControllers.Services.Implementations
+namespace LoginProject.Services.Implementations
 {
     public class UserService : IUserService
     {

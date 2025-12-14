@@ -1,5 +1,4 @@
-﻿@using NetworkCafesControllers.Models.ViewModels.Admin
-@model UserViewModel
+﻿@model UserViewModel
 @{
     ViewData["Title"] = "حذف مستخدم";
 }
@@ -18,12 +17,10 @@
 
                 <h4 class="mb-3">تأكيد الحذف</h4>
 
-                <p class="text-muted mb-4">
-                    هل أنت متأكد من حذف المستخدم
-                    <strong class="text-danger">@Model.UserName</strong>؟
-                    <br>
-                    هذا الإجراء لا يمكن التراجع عنه.
-                </p>
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <strong>تحذير:</strong> هذا الإجراء لا يمكن التراجع عنه!
+                </div>
 
                 <div class="card mb-4">
                     <div class="card-body text-start">
@@ -33,10 +30,25 @@
                             <strong>الأدوار:</strong>
                             @foreach (var role in Model.Roles)
                             {
-                                <span class="badge bg-secondary me-1">@role</span>
+                                <span class="badge @(role == "Admin" ? "bg-danger" : "bg-secondary") me-1">@role</span>
                             }
                         </p>
                         <p><strong>تاريخ التسجيل:</strong> @Model.RegistrationDate.ToString("yyyy-MM-dd")</p>
+                        <p>
+                            <strong>حالة الحساب:</strong>
+                            @if (Model.IsLockedOut)
+                            {
+                                <span class="badge bg-danger">محظور</span>
+                            }
+                            else if (Model.EmailConfirmed)
+                            {
+                                <span class="badge bg-success">نشط</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning">غير مفعل</span>
+                            }
+                        </p>
                     </div>
                 </div>
 
@@ -46,7 +58,7 @@
 
                     <div class="d-flex justify-content-center gap-3">
                         <a asp-action="Index" class="btn btn-secondary">
-                            <i class="bi bi-arrow-right me-1"></i> إلغاء
+                            <i class="bi bi-x-circle me-1"></i> إلغاء
                         </a>
                         <button type="submit" class="btn btn-danger">
                             <i class="bi bi-trash me-1"></i> نعم، احذف

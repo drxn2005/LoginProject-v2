@@ -1,4 +1,4 @@
-﻿namespace NetworkCafesControllers.Models.Identity
+﻿namespace LoginProject.Models.Identity
 {
     public static class AppRoles
     {

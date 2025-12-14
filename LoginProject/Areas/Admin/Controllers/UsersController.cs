@@ -1,20 +1,24 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using LoginProject.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using NetworkCafesControllers.Models.ViewModels.Admin;
-using NetworkCafesControllers.Services.Interfaces;
+using LoginProject.Models.ViewModels.Admin;
+using LoginProject.Models.ViewModels.Auth;
+using LoginProject.Services.Interfaces;
 
-namespace NetworkCafesControllers.Areas.Admin.Controllers
+namespace LoginProject.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin")]
     public class UsersController : Controller
     {
         private readonly IUserService _userService;
+        private readonly UserManager<ApplicationUser> _userManager;  
 
-        public UsersController(IUserService userService)
+        public UsersController(IUserService userService, UserManager<ApplicationUser> userManager)
         {
             _userService = userService;
+            _userManager = userManager;  
         }
 
         // GET: Admin/Users
@@ -220,41 +224,58 @@ namespace NetworkCafesControllers.Areas.Admin.Controllers
         public async Task<IActionResult> ResetPassword(string id)
         {
             if (string.IsNullOrEmpty(id))
-                return NotFound();
-
-            var user = await _userService.GetUserByIdAsync(id);
-            if (user == null)
-                return NotFound();
-
-            ViewBag.UserName = user.UserName;
-            ViewBag.UserId = user.Id;
-
-            return View();
-        }
-
-        // POST: Admin/Users/ResetPassword/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ResetPassword(string id, string newPassword)
-        {
-            var result = await _userService.ResetPasswordAsync(id, newPassword);
-
-            if (result.Succeeded)
             {
-                TempData["Success"] = "تم إعادة تعيين كلمة المرور بنجاح.";
+                TempData["Error"] = "معرف المستخدم غير صحيح";
                 return RedirectToAction(nameof(Index));
             }
 
-            foreach (var error in result.Errors)
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
             {
-                ModelState.AddModelError(string.Empty, error.Description);
+                TempData["Error"] = "المستخدم غير موجود";
+                return RedirectToAction(nameof(Index));
             }
 
-            var user = await _userService.GetUserByIdAsync(id);
-            ViewBag.UserName = user?.UserName;
-            ViewBag.UserId = id;
+            // استخدم AdminResetPasswordViewModel
+            var model = new AdminResetPasswordViewModel
+            {
+                UserId = id,
+                Email = user.Email ?? "بريد غير محدد",
+                UserName = user.UserName ?? "اسم غير محدد"
+            };
 
-            return View();
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(AdminResetPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByIdAsync(model.UserId);
+                if (user == null)
+                {
+                    TempData["Error"] = "المستخدم غير موجود";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword);
+
+                if (result.Succeeded)
+                {
+                    TempData["Success"] = $"تم إعادة تعيين كلمة المرور للمستخدم {user.UserName} بنجاح";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+            }
+
+            return View(model);
         }
     }
 }

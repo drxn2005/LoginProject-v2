@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using NetworkCafesControllers.Models.Entities;
+using LoginProject.Models;
 
-namespace NetworkCafesControllers.Data
+namespace LoginProject.Data
 {
     public static class IdentitySeed
     {

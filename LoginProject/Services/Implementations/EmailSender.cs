@@ -1,10 +1,10 @@
 ﻿using System.Net;
 using System.Net.Mail;
 using Microsoft.Extensions.Options;
-using NetworkCafesControllers.Models.Settings;
-using NetworkCafesControllers.Services.Interfaces;
+using LoginProject.Models.Settings;
+using LoginProject.Services.Interfaces;
 
-namespace NetworkCafesControllers.Services.Implementations
+namespace LoginProject.Services.Implementations
 {
     public class EmailSender : IEmailSender
     {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NetworkCafesControllers.Models.ViewModels.Auth
+namespace LoginProject.Models.ViewModels.Auth
 {
     public class ResetPasswordViewModel
     {

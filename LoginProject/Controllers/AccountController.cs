@@ -2,14 +2,15 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NetworkCafesControllers.Models.Entities;
-using NetworkCafesControllers.Models.ViewModels.Auth;
-using NetworkCafesControllers.Services.Interfaces;
+using LoginProject.Models;
+using LoginProject.Models.ViewModels.Auth;
+using LoginProject.Services.Interfaces;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
+using LoginProject.Models.Entities;
 
-namespace NetworkCafesControllers.Controllers
+namespace LoginProject.Controllers
 {
     public class AccountController : Controller
     {
@@ -147,7 +148,6 @@ namespace NetworkCafesControllers.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            // نحاول نجيب اليوزر باليوزرنيم أو الإيميل
             ApplicationUser? user = null;
             if (!string.IsNullOrWhiteSpace(model.UserNameOrEmail))
             {
@@ -159,14 +159,12 @@ namespace NetworkCafesControllers.Controllers
                         u.Email == input);
             }
 
-            // لو مش لاقي يوزر أصلاً -> ما نكشفش إذا كان موجود ولا لأ
             if (user == null)
             {
                 ModelState.AddModelError(string.Empty, "اسم المستخدم أو كلمة المرور غير صحيحة.");
                 return View(model);
             }
 
-            // محاولة تسجيل الدخول مع تفعيل الـ lockoutOnFailure
             var result = await _signInManager.PasswordSignInAsync(
                 user.UserName,
                 model.Password,
@@ -175,30 +173,31 @@ namespace NetworkCafesControllers.Controllers
 
             if (result.Succeeded)
             {
-                //var user = await _userManager.FindByNameAsync(model.UserName);
-                var theme = user?.ThemePreference ?? "system";
+                var userx = await _userManager.FindByNameAsync(model.UserNameOrEmail);
+                if (userx != null)
+                {
+                    userx.LastLoginDate = DateTimeOffset.UtcNow;
+                    await _userManager.UpdateAsync(userx);
+                }
 
-                Response.Cookies.Append(
-                    "theme",
-                    theme,
-                    new CookieOptions
-                    {
-                        HttpOnly = false,
-                        IsEssential = true,
-                        Expires = DateTimeOffset.UtcNow.AddYears(1)
-                    });
+                // Theme handling
+                var theme = userx?.ThemePreference ?? "system";
+                Response.Cookies.Append("theme", theme, new CookieOptions
+                {
+                    HttpOnly = false,
+                    IsEssential = true,
+                    Expires = DateTimeOffset.UtcNow.AddYears(1)
+                });
 
                 if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                     return Redirect(returnUrl);
                 return RedirectToAction("Index", "Brands");
             }
 
-            // لو الإيميل مش متأكد أو ممنوع يدخل
             if (result.IsNotAllowed)
             {
                 ModelState.AddModelError(string.Empty, "يجب تأكيد البريد الإلكتروني أولًا قبل تسجيل الدخول.");
             }
-            // لو الأكاونت اتقفل مؤقتًا بسبب محاولات فاشلة
             else if (result.IsLockedOut)
             {
                 var lockoutSpan = _userManager.Options.Lockout.DefaultLockoutTimeSpan;

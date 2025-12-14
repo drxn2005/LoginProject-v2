@@ -1,4 +1,4 @@
-﻿namespace NetworkCafesControllers.Models.Settings
+﻿namespace LoginProject.Models.Settings
 {
     public class EmailSettings
     {

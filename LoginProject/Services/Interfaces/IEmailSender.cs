@@ -1,4 +1,4 @@
-﻿namespace NetworkCafesControllers.Services.Interfaces
+﻿namespace LoginProject.Services.Interfaces
 {
     public interface IEmailSender
     {

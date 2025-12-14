@@ -1,0 +1,49 @@
+﻿@model LoginProject.Models.Brand
+
+@{
+    ViewData["Title"] = "حذف العلامة التجارية";
+}
+
+<div class="card shadow-sm border-danger">
+    <div class="card-header bg-danger text-white">
+        <h5 class="mb-0">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            تأكيد الحذف
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-danger">
+            <i class="bi bi-exclamation-octagon me-2"></i>
+            <strong>تحذير!</strong> أنت على وشك حذف العلامة التجارية التالية:
+        </div>
+
+        <dl class="row">
+            <dt class="col-sm-3">اسم العلامة:</dt>
+            <dd class="col-sm-9">@Model.Name</dd>
+
+            <dt class="col-sm-3">الوصف:</dt>
+            <dd class="col-sm-9">@(Model.Description ?? "لا يوجد وصف")</dd>
+        </dl>
+
+        <p class="text-danger">
+            <i class="bi bi-info-circle me-1"></i>
+            هل أنت متأكد من حذف هذه العلامة التجارية؟ لا يمكن التراجع عن هذا الإجراء.
+        </p>
+
+        <form asp-action="Delete" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-trash me-1"></i>
+                    نعم، احذف
+                </button>
+                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-circle me-1"></i>
+                    إلغاء
+                </a>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,4 +1,4 @@
-﻿@using NetworkCafesControllers.Models.ViewModels.Admin
+﻿@using LoginProject.Models.ViewModels.Admin
 @model UserViewModel
 @{
     ViewData["Title"] = "تفاصيل المستخدم";
@@ -24,7 +24,7 @@
                         <label class="form-label fw-bold">اسم المستخدم</label>
                         <p class="form-control-plaintext">@Model.UserName</p>
                     </div>
-
+                    
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">البريد الإلكتروني</label>
                         <p class="form-control-plaintext">@Model.Email</p>
@@ -38,13 +38,13 @@
                         }
                     </div>
                 </div>
-
+                
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">رقم الهاتف</label>
                         <p class="form-control-plaintext">@Model.PhoneNumber</p>
                     </div>
-
+                    
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">حالة الحساب</label>
                         <p>
@@ -63,30 +63,30 @@
                         </p>
                     </div>
                 </div>
-
+                
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">الأدوار</label>
                         <p>
                             @foreach (var role in Model.Roles)
                             {
-                                <span class="badge bg-secondary me-1">@role</span>
+                                <span class="badge @(role == "Admin" ? "bg-danger" : "bg-secondary") me-1">@role</span>
                             }
                         </p>
                     </div>
-
+                    
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">محاولات الفشل</label>
                         <p>@Model.AccessFailedCount</p>
                     </div>
                 </div>
-
+                
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">تاريخ التسجيل</label>
                         <p class="form-control-plaintext">@Model.RegistrationDate.ToString("yyyy-MM-dd HH:mm")</p>
                     </div>
-
+                    
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">آخر تسجيل دخول</label>
                         <p class="form-control-plaintext">
@@ -101,12 +101,12 @@
                         </p>
                     </div>
                 </div>
-
+                
                 <div class="d-flex gap-2 mt-4">
                     <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
                         <i class="bi bi-pencil me-1"></i> تعديل
                     </a>
-
+                    
                     @if (Model.IsLockedOut)
                     {
                         <form asp-action="Unlock" method="post" class="d-inline">
@@ -128,7 +128,7 @@
                             </button>
                         </form>
                     }
-
+                    
                     <a asp-action="ResetPassword" asp-route-id="@Model.Id" class="btn btn-secondary">
                         <i class="bi bi-key me-1"></i> إعادة تعيين كلمة المرور
                     </a>
@@ -136,7 +136,7 @@
             </div>
         </div>
     </div>
-
+    
     <div class="col-md-4">
         <div class="card border-0 shadow-sm">
             <div class="card-header bg-transparent">
@@ -147,11 +147,11 @@
                     <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary text-start">
                         <i class="bi bi-pencil me-2"></i> تعديل البيانات
                     </a>
-
-                    <a asp-action="ResetPassword" asp-route-id="@Model.Id" class="btn btn-outline-secondary text-start">
+                    
+                    <a asp-area="Admin" asp-action="ResetPassword" asp-route-id="@Model.Id" class="btn btn-outline-secondary text-start">
                         <i class="bi bi-key me-2"></i> تغيير كلمة المرور
                     </a>
-
+                    
                     @if (Model.IsLockedOut)
                     {
                         <form asp-action="Unlock" method="post" class="d-grid">
@@ -164,13 +164,13 @@
                     }
                     else
                     {
-                        <button type="button" class="btn btn-outline-warning text-start"
+                        <button type="button" class="btn btn-outline-warning text-start" 
                                 data-bs-toggle="modal" data-bs-target="#lockModal">
                             <i class="bi bi-lock me-2"></i> قفل الحساب
                         </button>
                     }
-
-                    <button type="button" class="btn btn-outline-danger text-start"
+                    
+                    <button type="button" class="btn btn-outline-danger text-start" 
                             data-bs-toggle="modal" data-bs-target="#deleteModal">
                         <i class="bi bi-trash me-2"></i> حذف المستخدم
                     </button>
@@ -198,7 +198,7 @@
                             <i class="bi bi-clock me-2"></i>قفل لمدة ساعة
                         </button>
                     </form>
-
+                    
                     <form asp-action="Lock" method="post">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="id" value="@Model.Id" />
@@ -207,7 +207,7 @@
                             <i class="bi bi-calendar-day me-2"></i>قفل لمدة يوم
                         </button>
                     </form>
-
+                    
                     <form asp-action="Lock" method="post">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="id" value="@Model.Id" />
@@ -231,8 +231,8 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                هل أنت متأكد من حذف المستخدم <strong>@Model.UserName</strong>؟
-                <br><small class="text-muted">هذا الإجراء لا يمكن التراجع عنه.</small>
+                <p>هل أنت متأكد من حذف المستخدم <strong>@Model.UserName</strong>؟</p>
+                <p class="text-danger small"><i class="bi bi-exclamation-triangle"></i> هذا الإجراء لا يمكن التراجع عنه.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>

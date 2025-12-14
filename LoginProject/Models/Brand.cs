@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;  // أضف هذا السطر
+using Microsoft.AspNetCore.Http;
 
-namespace NetworkCafesControllers.Models.Entities
+namespace LoginProject.Models
 {
     public class Brand
     {
@@ -18,6 +20,10 @@ namespace NetworkCafesControllers.Models.Entities
         [Url(ErrorMessage = "الرجاء إدخال رابط صحيح")]
         [Display(Name = "رابط الشعار")]
         public string? LogoUrl { get; set; }
+
+        [NotMapped]  // أضف هذا السطر - مهم جداً!
+        [Display(Name = "شعار العلامة")]
+        public IFormFile? LogoFile { get; set; }  // للرفع فقط
 
         [Url(ErrorMessage = "الرجاء إدخال رابط موقع صحيح")]
         [Display(Name = "الموقع الإلكتروني")]

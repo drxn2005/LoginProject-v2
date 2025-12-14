@@ -1,4 +1,4 @@
-﻿namespace NetworkCafesControllers.Models.Entities
+﻿namespace LoginProject.Models.Entities
 {
     public class AppUser
     {

@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using NetworkCafesControllers.Data;
-using NetworkCafesControllers.Models.Entities;
-using NetworkCafesControllers.Models.Settings;
-using NetworkCafesControllers.Services.Implementations;
-using NetworkCafesControllers.Services.Interfaces;
+using LoginProject.Data;
+using LoginProject.Models;
+using LoginProject.Models.Settings;
+using LoginProject.Services.Implementations;
+using LoginProject.Services.Interfaces;
+using LoginProject.Models.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -120,6 +121,10 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "default",
